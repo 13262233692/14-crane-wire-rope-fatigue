@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package alert.v1;
+
+option go_package = "crane-fatigue-monitor/proto/alert/v1;alertv1";
+
+// 告警订阅服务：客户端订阅指定钢丝绳的疲劳告警流
+service AlertService {
+  rpc SubscribeAlerts(SubscribeRequest) returns (stream Alert);
+}
+
+message SubscribeRequest {
+  // 为空表示订阅全部钢丝绳
+  repeated string rope_ids = 1;
+  // 最低告警级别: 1=INFO 2=WARNING 3=CRITICAL
+  int32 min_level = 2;
+}
+
+message Alert {
+  string alert_id = 1;
+  string rope_id = 2;
+  int32 level = 3;            // 1=INFO 2=WARNING 3=CRITICAL
+  string message = 4;
+  double damage_fraction = 5; // Miner 累积损伤 D (1.0 = 失效)
+  double remaining_life_pct = 6;
+  int64 occurred_at_unix = 7;
+}
